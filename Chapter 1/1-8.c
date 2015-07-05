@@ -5,8 +5,7 @@ main()
 {
 	int nblanks=0, ntabs=0, newline=0;
 	char c;
-	while((c=getchar())!= EOF )
-	{
+	while((c=getchar())!= EOF ){
 		if(c==' ')
 			nblanks++;
 		else if(c=='\t')

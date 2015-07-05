@@ -4,12 +4,9 @@
 main()
 {
 	char c;
-	while((c=getchar())!='\n')
-	{
+	while((c=getchar())!='\n') {
 		if(c==' ')
-		{
 			printf("\n");
-		}
 		else
 			putchar(c);
 	}
