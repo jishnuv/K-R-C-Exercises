@@ -2,11 +2,16 @@
 unmatched parentheses, brackets and braces. Don't forget about quotes, both single and
 double, escape sequences, and comments.*/
 #include<stdio.h>
-#define MAXSIZE 2000
+#define MAXSIZE 3000
+char stack[300];
+int top = -1;
 
+int skipper(char input[], int start, int mod);
+void push(char );
+char pop();
 int main() 
 {
-    int i = 0, check[6] = {0};
+    int i = 0;
     int len = 0;
     char c, buffr[MAXSIZE];
 
@@ -17,48 +22,82 @@ int main()
     }
     buffr[len] = '\0';
     while (i < len) {
-        if (buffr[i] == '(')
-            check[0]++;
-        else if (buffr[i] == ')')
-            check[0]--;
-
-        if (buffr[i] == '[')
-            check[1]++;
-        else if (buffr[i] == ']')
-            check[1]--;
-
-        if (buffr[i] == '{')
-            check[2]++;
-        else if (buffr[i] == '}')
-            check[2]--;
-
-        if (buffr[i] == '\'')
-            check[3]++;
-
-        if (buffr[i] == '\"')
-            check[4]++;
-        if (buffr[i] == '/' && buffr[i + 1] == '*') {
-            check[5]++;
-            i++;
-        } else if (buffr[i] == '*' && buffr[i + 1] == '/') {
-            check[5]--;
-            i++;
+    	
+       	if (buffr[i] == '(' || buffr[i] == '[' || buffr[i] == '{' )
+            push(buffr[i]);
+        else if(buffr[i] == ')') {
+        	if(pop() != '(')
+        		printf("out of order parentheses\n");
+        }
+        else if(buffr[i] == ']') {
+        	if(pop() != '[')
+        		printf("out of order bracket\n");
+        }
+        else if(buffr[i] == '}') {
+        	if(pop() != '{')
+        		printf("out of order brace\n");
         }
 
+        if (buffr[i] == '\'')
+            i = skipper(buffr, i+1, 3);
+
+        if (buffr[i] == '\"')
+            i = skipper(buffr, i+1, 2);
+        if (buffr[i] == '/' && (buffr[i + 1] == '*')) {
+            i = skipper(buffr,i+2,0);
+        }
+        if (buffr[i] == '/' && (buffr[i+1]=='/')) {
+            i = skipper(buffr,i+2,1);
+        }
         i++;
     }
-
-    if (check[5] != 0)
-        printf("Unterminated comment\n");
-    if (check[0] != 0)
-        printf("Unmatched () detected\n");
-    if (check[1] != 0)
-        printf("Unmatched [] detected\n");
-    if (check[2] != 0)
-        printf("Unmatched {} detected\n");
-    if ((check[3] % 2) != 0)
-        printf("Unmatched single quote detected\n");
-    if ((check[4] % 2) != 0)
-        printf("Unmatched double quote detected\n");
+    if(top > -1)
+    	printf(".......syntax errors........\n");
     return 0;
 } 
+
+void push(char c)
+{
+	top++;
+	stack[top] = c;
+}
+
+char pop()
+{
+	char c;
+	if(top == -1)
+		return '\0';
+	c = stack[top];
+	top--;
+	return c;
+}
+	
+int skipper(char input[], int start, int mod)
+{	
+	int i = start;
+	if(mod == 0) {
+		while(input[i] != '*' && input[i + 1] != '/') {
+			i++;
+		}
+		return i+1;
+	}
+	else if(mod == 1) {
+		while(input[i] != '\n') {
+			i++;
+		}
+		return i;
+	}
+	else if(mod == 2) {
+		while(input[i] != '\"') {
+			i++;
+		}
+		return i;
+	}
+	else if(mod == 3) {
+		while(input[i] != '\'') {
+			i++;
+		}
+		return i;
+	}
+	return start;
+}
